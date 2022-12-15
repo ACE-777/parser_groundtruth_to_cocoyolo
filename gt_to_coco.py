@@ -1,18 +1,16 @@
-import torch
 import os
-import re
 import numpy as np
 import cv2
 
 
-path_to_datasets_for_warmup = str("C:\\Users\\misha\\golf-trajectory_project\\stabil_11_14")  # path to stabil_11_14
+path_to_datasets_for_warmup = str("C:\\Users\\misha\\golf-trajectory_project\\stabil_11_14\\stabil_11_14")  # path to stabil_11_14
 dir_of_videos_list = os.listdir(path_to_datasets_for_warmup)
 for dir_name in range(len(dir_of_videos_list)):
     img_list = os.listdir(path_to_datasets_for_warmup + r"\\" + dir_of_videos_list[dir_name])  # opt.source
     path_to_groundtruth_file = os.path.join(path_to_datasets_for_warmup + r"\\", dir_of_videos_list[dir_name] +
-                                            r"\\" + img_list[-1])
+                                            r"\\" + "groundtruth.txt")
     im_file = os.path.join(path_to_datasets_for_warmup + r"\\" + dir_of_videos_list[dir_name],
-                           img_list[0])  # opt.source
+                           img_list[1])  # opt.source
     im_in = np.array(cv2.imread(im_file))
     file = open(path_to_groundtruth_file, mode='r', encoding='utf-8-sig')
     lines = file.readlines()
