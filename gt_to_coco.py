@@ -1,18 +1,18 @@
 import os
 import numpy as np
 import cv2
+from pathlib import Path
+import shutil
 
-
-path_to_datasets_for_warmup = str("C:\\Users\\misha\\golf-trajectory_project\\stabil_11_14\\stabil_11_14")  # path to stabil_11_14
+path_to_datasets_for_warmup = str("C:\\Users\\misha\\golfTrajectory\\stabil_11_14_1\\stabil_11_14")  # path to stabil_11_14
 dir_of_videos_list = os.listdir(path_to_datasets_for_warmup)
 for dir_name in range(len(dir_of_videos_list)):
-    img_list = os.listdir(path_to_datasets_for_warmup + r"\\" + dir_of_videos_list[dir_name])  # opt.source
-    path_to_groundtruth_file = os.path.join(path_to_datasets_for_warmup + r"\\", dir_of_videos_list[dir_name] +
-                                            r"\\" + "groundtruth.txt")
-    im_file = os.path.join(path_to_datasets_for_warmup + r"\\" + dir_of_videos_list[dir_name],
-                           img_list[1])  # opt.source
+    img_list = os.listdir(os.path.join(path_to_datasets_for_warmup, dir_of_videos_list[dir_name]))  # opt.source
+    path_to_ground_truth_file = os.path.join(path_to_datasets_for_warmup, os.path.join(dir_of_videos_list[dir_name], "groundtruth.txt"))
+    im_file = os.path.join(path_to_datasets_for_warmup, os.path.join(dir_of_videos_list[dir_name],
+                           img_list[1])) # opt.source
     im_in = np.array(cv2.imread(im_file))
-    file = open(path_to_groundtruth_file, mode='r', encoding='utf-8-sig')
+    file = open(path_to_ground_truth_file, mode='r', encoding='utf-8-sig')
     lines = file.readlines()
     coordinates_from_ground_truth_file = np.empty((len(lines), 4), dtype="float64")
     for i in range(len(lines)):
@@ -32,10 +32,16 @@ for dir_name in range(len(dir_of_videos_list)):
                                                            + float(lines[i].split(",")[3])) / 2 -
                                                            float(lines[i].split(",")[1])) / im_in.shape[0]
     file.close()
-    file_1 = open(path_to_groundtruth_file, mode='w', encoding='utf-8-sig')
-    for i in range(len(coordinates_from_ground_truth_file)):
-        file_1.write("0 ")
-        for j in range(4):
-            file_1.write(str(coordinates_from_ground_truth_file[i][j]) + " ")
-        file_1.write("\n")
-    file_1.close()
+    for i in range(len(img_list)-2):
+        image = os.path.join(path_to_datasets_for_warmup, os.path.join(dir_of_videos_list[dir_name],
+                                                                     img_list[i]))
+        path_dir = Path(dir_of_videos_list[dir_name])
+        path_img = Path(img_list[i])
+        destination_path_for_img = os.path.join("C:\\Users\\misha\\golfTrajectory\\stabil_11_14_1\\images",
+                                        str(path_dir.stem) + "_" + str(img_list[i]))
+        shutil.move(image, destination_path_for_img)
+
+        file_with_annotation = open(os.path.join("C:\\Users\\misha\\golfTrajectory\\stabil_11_14_1\\annotations",
+                                str(path_dir.stem) + "_" + str(path_img.stem) + ".txt"), mode='a', encoding='utf-8-sig')
+        file_with_annotation.write(str((str(str(coordinates_from_ground_truth_file[i]).split("[")[1])).split("]")[0]))
+        file_with_annotation.close()
