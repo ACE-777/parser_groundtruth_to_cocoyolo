@@ -14,7 +14,7 @@ for dir_name in range(len(dir_of_videos_list)):
     im_in = np.array(cv2.imread(im_file))
     file = open(path_to_ground_truth_file, mode='r', encoding='utf-8-sig')
     lines = file.readlines()
-    coordinates_from_ground_truth_file = np.empty((len(lines), 4), dtype="float64")
+    coordinates_from_ground_truth_file = np.empty((len(lines), 4), dtype="float32")
     for i in range(len(lines)):
         for j in range(4):
             if j == 0:  # center_x
@@ -32,16 +32,23 @@ for dir_name in range(len(dir_of_videos_list)):
                                                            + float(lines[i].split(",")[3])) / 2 -
                                                            float(lines[i].split(",")[1])) / im_in.shape[0]
     file.close()
+
+    zero = 0
+
     for i in range(len(img_list)-2):
         image = os.path.join(path_to_datasets_for_warmup, os.path.join(dir_of_videos_list[dir_name],
                                                                      img_list[i]))
         path_dir = Path(dir_of_videos_list[dir_name])
         path_img = Path(img_list[i])
         destination_path_for_img = os.path.join("C:\\Users\\misha\\golfTrajectory\\stabil_11_14_1\\images",
-                                        str(path_dir.stem) + "_" + str(img_list[i]))
+                                        str(path_dir.stem.split(".")[0]) + "_" + str(img_list[i]))
         shutil.move(image, destination_path_for_img)
 
         file_with_annotation = open(os.path.join("C:\\Users\\misha\\golfTrajectory\\stabil_11_14_1\\annotations",
-                                str(path_dir.stem) + "_" + str(path_img.stem) + ".txt"), mode='a', encoding='utf-8-sig')
-        file_with_annotation.write(str((str(str(coordinates_from_ground_truth_file[i]).split("[")[1])).split("]")[0]))
+                                str(path_dir.stem.split(".")[0]) + "_" + str(path_img.stem) + ".txt"),
+                                mode='a', encoding='utf-8')
+        file_with_annotation.write(str(
+        str(zero) + str(" ") + str(coordinates_from_ground_truth_file[i][0]) + str(" ") +
+        str(coordinates_from_ground_truth_file[i][1]) + str(" ") + str(coordinates_from_ground_truth_file[i][2]) +
+        str(" ") + str(coordinates_from_ground_truth_file[i][3])).replace('\п»ї', ''))
         file_with_annotation.close()
